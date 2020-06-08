@@ -17,9 +17,11 @@ client.on('ready', () => {
     var _a;
     console.log(`Logged in as ${(_a = client.user) === null || _a === void 0 ? void 0 : _a.tag}`);
 });
+let matches = [];
 client.on("message", async (message) => {
     var _a;
     const prefix = config.prefix;
+    console.log(matches);
     if (message.content.indexOf(prefix) !== 0 || message.author.bot) {
         return;
     }
@@ -41,7 +43,7 @@ client.on("message", async (message) => {
         submit_1.submit(message);
     }
     else if (command === "start") {
-        start_1.start(message, client);
+        start_1.start(message, client, matches);
     }
 });
 client.login(config.token);

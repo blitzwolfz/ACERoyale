@@ -1,6 +1,6 @@
 import * as Discord from "discord.js";
 import * as config from "./misc/config.json";
-//import {activematch} from "./misc/struct"
+import {activematch} from "./misc/struct"
 import {submit} from "./commands/submit"
 import { start } from "./commands/start";
 
@@ -12,10 +12,16 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user?.tag}`);
 });
 
-//let matches:activematch[] = []
+let matches:activematch[] = []
 
 client.on("message", async message => {
+
+  if (message.author.id == client.user.id){
+    return;
+  }
+
   const prefix = config.prefix;
+  console.log(matches)
 
   if (message.content.indexOf(prefix) !== 0 || message.author.bot){
     return;
@@ -32,6 +38,8 @@ client.on("message", async message => {
   if (!command){
     return
   };
+  
+
 
   if (command === "ping") {
     const m: Discord.Message = await message.channel.send("Ping?") as Discord.Message;
@@ -43,7 +51,7 @@ client.on("message", async message => {
   }
 
   else if(command === "start"){
-    start(message, client)
+    start(message, client, matches)
   }
 
 });
