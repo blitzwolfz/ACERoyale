@@ -1,0 +1,22 @@
+{
+  "name": "aceroyale",
+  "version": "0.0.1",
+  "description": "It's a bot for fun",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blitzwolfz/ACERoyale.git"
+  },
+  "author": "blitzwolfz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blitzwolfz/ACERoyale/issues"
+  },
+  "homepage": "https://github.com/blitzwolfz/ACERoyale#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1"
+  }
+}
