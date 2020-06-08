@@ -20,6 +20,9 @@ client.on('ready', () => {
 let matches = [];
 client.on("message", async (message) => {
     var _a;
+    if (message.author.id == client.user.id) {
+        return;
+    }
     const prefix = config.prefix;
     console.log(matches);
     if (message.content.indexOf(prefix) !== 0 || message.author.bot) {
@@ -40,10 +43,11 @@ client.on("message", async (message) => {
         m.edit(`Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`);
     }
     else if (command === "submit") {
-        submit_1.submit(message);
+        submit_1.submit(message, matches);
     }
     else if (command === "start") {
         start_1.start(message, client, matches);
     }
+    start_1.running(matches, client);
 });
 client.login(config.token);

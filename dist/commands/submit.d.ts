@@ -1,2 +1,3 @@
 import * as Discord from "discord.js";
-export declare function submit(message: Discord.Message): Promise<Discord.Message | Discord.Message[] | "cool">;
+import { activematch } from "../misc/struct";
+export declare function submit(message: Discord.Message, matches: activematch[]): Promise<Discord.Message | Discord.Message[] | undefined>;

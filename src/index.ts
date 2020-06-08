@@ -2,7 +2,7 @@ import * as Discord from "discord.js";
 import * as config from "./misc/config.json";
 import {activematch} from "./misc/struct"
 import {submit} from "./commands/submit"
-import { start } from "./commands/start";
+import { start, running } from "./commands/start";
 
 console.log("Hello World, bot has begun life");
 
@@ -27,6 +27,7 @@ client.on("message", async message => {
     return;
   }
 
+
   var args: Array<string> = message.content.slice(prefix.length).trim().split(/ +/g);
   
   if (!args || args.length === 0) {
@@ -47,13 +48,14 @@ client.on("message", async message => {
   }
 
   else if(command === "submit"){
-    submit(message)
+    submit(message, matches)
   }
 
   else if(command === "start"){
     start(message, client, matches)
   }
 
+  running(matches, client)
 });
 
 client.login(config.token);
