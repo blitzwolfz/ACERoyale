@@ -11,6 +11,7 @@ const Discord = __importStar(require("discord.js"));
 const config = __importStar(require("./misc/config.json"));
 const submit_1 = require("./commands/submit");
 const start_1 = require("./commands/start");
+const winner_1 = require("./commands/winner");
 console.log("Hello World, bot has begun life");
 const client = new Discord.Client();
 client.on('ready', () => {
@@ -18,13 +19,40 @@ client.on('ready', () => {
     console.log(`Logged in as ${(_a = client.user) === null || _a === void 0 ? void 0 : _a.tag}`);
 });
 let matches = [];
+client.on("messageReactionAdd", async function (messageReaction, user) {
+    var _a;
+    console.log(`a reaction is added to a message`);
+    if (user.bot)
+        return;
+    if (matches) {
+        for (const match of matches) {
+            let id = (_a = client.channels.get(messageReaction.message.channel.id)) === null || _a === void 0 ? void 0 : _a.id;
+            if (match.channelid === id) {
+                if (messageReaction.emoji.name === "🅱️") {
+                    match.p2.votes += 1;
+                    await messageReaction.remove(user.id);
+                    await messageReaction.message.react("🅱️");
+                }
+                else if (messageReaction.emoji.name === "🅰️") {
+                    match.p1.votes += 1;
+                    await messageReaction.remove(user.id);
+                    await messageReaction.message.react("🅰️");
+                }
+            }
+        }
+        return;
+    }
+    else {
+        return;
+    }
+});
 client.on("message", async (message) => {
     var _a;
-    if (message.author.id == client.user.id) {
+    if (message.author.bot) {
         return;
     }
     const prefix = config.prefix;
-    console.log(matches);
+    start_1.running(message, matches, client);
     if (message.content.indexOf(prefix) !== 0 || message.author.bot) {
         return;
     }
@@ -48,6 +76,8 @@ client.on("message", async (message) => {
     else if (command === "start") {
         start_1.start(message, client, matches);
     }
-    start_1.running(matches, client);
+    else if (command === "end") {
+        winner_1.endmatch(message, matches, client);
+    }
 });
 client.login(config.token);

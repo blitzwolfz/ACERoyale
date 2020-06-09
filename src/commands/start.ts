@@ -2,6 +2,7 @@ import * as discord from "discord.js"
 import {getUser} from "../misc/utils"
 import {prefix} from "../misc/config.json"
 import {activematch} from "../misc/struct"
+import { endmatch, end } from "./winner"
 
 export async function start(message: discord.Message, client: discord.Client, matches: activematch[]){
     //.start @user1 @user2
@@ -10,7 +11,7 @@ export async function start(message: discord.Message, client: discord.Client, ma
     var args: Array<string> = message.content.slice(prefix.length).trim().split(/ +/g)
     
     if (args.length < 3) {
-        return message.reply("invalid response. Command is `.start @user1 @user2 template`")
+        return message.reply("invalid response. Command is `.start @user1 @user2 template link`\n or `.start @user1 @user2 theme theme description`")
     }
     
     //console.log(args)
@@ -33,16 +34,19 @@ export async function start(message: discord.Message, client: discord.Client, ma
             memedone: false,
             time: Date.now(),
             memelink: "",
+            votes: 0,
         },
         p2:{
             userid: user2,
             username: user2.username,
             memedone: false,
-            time: Date.now(),
+            time: Math.floor(Date.now() / 1000),
             memelink: "",
+            votes: 0,
         },
-        votetime: Date.now(),
-        votingperiod: false
+        votetime: Math.floor(Date.now() / 1000),
+        votingperiod: false,
+        // votemessage: null,
     }
 
     let embed = new discord.RichEmbed()
@@ -66,16 +70,24 @@ export async function start(message: discord.Message, client: discord.Client, ma
         // await message.channel.send(att)
     }
 
+    else if (["th", "theme"].includes(args[3])){
+        await user1.send(`Your theme is: ${args[4]}`)       
+        await user2.send(`Your theme is: ${args[4]}`)
+
+        // await message.channel.send("Here is your template:")
+        // await message.channel.send(att)
+    }
+
     //console.log(newmatch)
     matches.push(newmatch)
 
     return matches;
 }
-    
 
-
-export async function running(matches: activematch[], client: discord.Client){
+export async function running(messages: discord.Message, matches: activematch[], client: discord.Client){
     for (const match of matches){
+        console.log(Math.floor(Date.now() / 1000) - match.votetime)
+        console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 35)
         let channelid = <discord.TextChannel>client.channels.get(match.channelid)
 
         // if((match.p2.memedone === true) && (match.p1.memedone === true)){
@@ -93,11 +105,11 @@ export async function running(matches: activematch[], client: discord.Client){
         // }
 
         if(match.votingperiod === false){
-            if(Date.now() - match.p1.time === 0 && match.p1.memedone === false){
+            if((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false){
                 match.p1.userid.send("You have failed to submit your meme, your opponet is the winner.")
 
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.id} and ${match.p2.userid.id}`)
+                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
                 .setDescription(`<@${match.p2.userid.id}> has won!`)
                 .setTimestamp()
 
@@ -105,19 +117,33 @@ export async function running(matches: activematch[], client: discord.Client){
                 match.matchdone = true
             }
 
-            else if(Date.now() - match.p2.time === 0 && match.p2.memedone === false){
-                match.p1.userid.send("You have failed to submit your meme, your opponet is the winner.")
+            if((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false){
+                console.log(Date.now() - match.p2.time)
+                match.p2.userid.send("You have failed to submit your meme, your opponet is the winner.")
 
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.id} and ${match.p2.userid.id}`)
-                .setDescription(`<@${match.p1.userid.id}> has won!`)
+                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
+                .setDescription(`<@${match.p1.userid.username}> has won!`)
                 .setTimestamp()
 
                 channelid.send(embed)
                 match.matchdone = true
             }
 
-            else if((match.p2.memedone === true) && (match.p1.memedone === true)){
+            if(((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)){
+                match.p1.userid.send("You have failed to submit your meme")
+                match.p2.userid.send("You have failed to submit your meme")
+
+                let embed = new discord.RichEmbed()
+                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
+                .setDescription(`<@${match.p1.userid.id}> & ${match.p2.userid.username}have lost\n for not submitting meme on time`)
+                .setTimestamp()
+
+                channelid.send(embed)
+                match.matchdone = true
+            }
+
+            if(((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)){
                 let embed1 = new discord.RichEmbed()
                 .setImage(match.p1.memelink)
                 .setTimestamp()
@@ -138,17 +164,27 @@ export async function running(matches: activematch[], client: discord.Client){
                     await (msg as discord.Message).react("🅰️")
                     await (msg as discord.Message).react("🅱️")
                 })
+                
+                // channelid.fetchMessages({ limit: 1 }).then(messages => {
+                //     let lastMessage = messages.first();
+                //     match.votemessage = lastMessage
+                // })
+
+                //console.log(match.votemessage?.content)
+
+                match.votingperiod = true
+                match.votetime = (Math.floor(Date.now() / 1000))
                 // let messages: discord.Collection < string, discord.Message > = await channelid.fetchMessage(channelid.id)
     
                 // let react = messages.last().id
             }
-            
-
-
         }
 
-
-
-
+        if(match.votingperiod === true){
+            //7200
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 35)){
+                end(messages, matches, client)
+            }
+        }
     }
 }
