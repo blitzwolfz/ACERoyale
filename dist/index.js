@@ -12,11 +12,13 @@ const config = __importStar(require("./misc/config.json"));
 const submit_1 = require("./commands/submit");
 const start_1 = require("./commands/start");
 const winner_1 = require("./commands/winner");
+const db_1 = require("./misc/db");
 console.log("Hello World, bot has begun life");
 const client = new Discord.Client();
 client.on('ready', () => {
     var _a;
     console.log(`Logged in as ${(_a = client.user) === null || _a === void 0 ? void 0 : _a.tag}`);
+    db_1.connectToDB();
 });
 let matches = [];
 client.on("messageReactionAdd", async function (messageReaction, user) {
@@ -74,7 +76,7 @@ client.on("message", async (message) => {
         submit_1.submit(message, matches);
     }
     else if (command === "start") {
-        start_1.start(message, client, matches);
+        start_1.start(message, client);
     }
     else if (command === "end") {
         winner_1.endmatch(message, matches, client);

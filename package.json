@@ -1,6 +1,6 @@
 {
   "name": "aceroyale",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "It's a bot for fun",
   "main": "index.ts",
   "scripts": {
@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/blitzwolfz/ACERoyale#readme",
   "dependencies": {
+    "@discordjs/uws": "^10.149.0",
+    "@types/mongodb": "^3.5.20",
     "discord.js": "^11.5.1",
     "mongodb": "^3.5.5"
   }

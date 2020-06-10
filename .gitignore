@@ -1,8 +1,19 @@
 
 testtemp.png
 
-dist/misc/
-
-src/misc/
 
 node_modules/
+
+src/misc/config.json
+
+src/misc/utils.ts
+
+dist/misc/config.json
+
+dist/misc/commandinterface.js
+
+dist/misc/commandinterface.d.ts
+
+dist/misc/utils.js
+
+dist/misc/utils.d.ts

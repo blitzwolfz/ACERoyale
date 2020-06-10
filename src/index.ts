@@ -4,6 +4,7 @@ import {activematch} from "./misc/struct"
 import {submit} from "./commands/submit"
 import { start, running } from "./commands/start";
 import { endmatch } from "./commands/winner";
+import { connectToDB } from "./misc/db";
 
 console.log("Hello World, bot has begun life");
 
@@ -13,6 +14,7 @@ const client = new Discord.Client();
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user?.tag}`);
+    connectToDB()
 });
 
 let matches:activematch[] = []
@@ -91,7 +93,7 @@ client.on("message", async message => {
   }
 
   else if(command === "start"){
-    start(message, client, matches)
+    start(message, client)
   }
 
   else if(command === "end"){

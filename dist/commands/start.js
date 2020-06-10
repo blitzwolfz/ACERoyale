@@ -11,11 +11,12 @@ const discord = __importStar(require("discord.js"));
 const utils_1 = require("../misc/utils");
 const config_json_1 = require("../misc/config.json");
 const winner_1 = require("./winner");
-async function start(message, client, matches) {
+const db_1 = require("../misc/db");
+async function start(message, client) {
     let users = [];
     var args = message.content.slice(config_json_1.prefix.length).trim().split(/ +/g);
     if (args.length < 3) {
-        return message.reply("invalid response. Command is `.start @user1 @user2 template link`\n or `.start @user1 @user2 theme theme description`");
+        return message.reply("invalid response. Command is `.start @user1 @user2 template link`\n or `.start @user1 @user2 theme description`");
     }
     for (let i = 0; i < args.length; i++) {
         let userid = await utils_1.getUser(args[i]);
@@ -27,10 +28,8 @@ async function start(message, client, matches) {
     let user2 = (await client.fetchUser(users[1]));
     let newmatch = {
         channelid: message.channel.id,
-        matchdone: false,
         p1: {
             userid: user1,
-            username: user1.username,
             memedone: false,
             time: Date.now(),
             memelink: "",
@@ -38,7 +37,6 @@ async function start(message, client, matches) {
         },
         p2: {
             userid: user2,
-            username: user2.username,
             memedone: false,
             time: Math.floor(Date.now() / 1000),
             memelink: "",
@@ -63,8 +61,7 @@ async function start(message, client, matches) {
         await user1.send(`Your theme is: ${args[4]}`);
         await user2.send(`Your theme is: ${args[4]}`);
     }
-    matches.push(newmatch);
-    return matches;
+    await db_1.addMatch(newmatch);
 }
 exports.start = start;
 async function running(messages, matches, client) {
@@ -80,7 +77,6 @@ async function running(messages, matches, client) {
                     .setDescription(`<@${match.p2.userid.id}> has won!`)
                     .setTimestamp();
                 channelid.send(embed);
-                match.matchdone = true;
             }
             if ((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) {
                 console.log(Date.now() - match.p2.time);
@@ -90,7 +86,6 @@ async function running(messages, matches, client) {
                     .setDescription(`<@${match.p1.userid.username}> has won!`)
                     .setTimestamp();
                 channelid.send(embed);
-                match.matchdone = true;
             }
             if (((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)) {
                 match.p1.userid.send("You have failed to submit your meme");
@@ -100,7 +95,6 @@ async function running(messages, matches, client) {
                     .setDescription(`<@${match.p1.userid.id}> & ${match.p2.userid.username}have lost\n for not submitting meme on time`)
                     .setTimestamp();
                 channelid.send(embed);
-                match.matchdone = true;
             }
             if (((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)) {
                 let embed1 = new discord.RichEmbed()
@@ -123,13 +117,8 @@ async function running(messages, matches, client) {
             }
         }
         if (match.votingperiod === true) {
-            console.log("FUCK");
             if ((Math.floor(Date.now() / 1000) - match.votetime >= 35)) {
-                console.log("FUCK2");
                 winner_1.end(messages, matches, client);
-            }
-            else {
-                continue;
             }
         }
     }

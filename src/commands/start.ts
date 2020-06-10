@@ -3,8 +3,9 @@ import {getUser} from "../misc/utils"
 import {prefix} from "../misc/config.json"
 import {activematch} from "../misc/struct"
 import { end } from "./winner"
+import { addMatch } from "../misc/db"
 
-export async function start(message: discord.Message, client: discord.Client, matches: activematch[]){
+export async function start(message: discord.Message, client: discord.Client){
     //.start @user1 @user2
 
     let users:string[] = []
@@ -76,9 +77,11 @@ export async function start(message: discord.Message, client: discord.Client, ma
     }
 
     //console.log(newmatch)
-    matches.push(newmatch)
+    // matches.push(newmatch)
 
-    return matches;
+    // return matches;
+
+    await addMatch(newmatch)
 }
 
 export async function running(messages: discord.Message, matches: activematch[], client: discord.Client){
