@@ -4,3 +4,5 @@ testtemp.png
 dist/misc/
 
 src/misc/
+
+node_modules/
