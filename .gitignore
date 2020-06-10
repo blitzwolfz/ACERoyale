@@ -1,6 +1,8 @@
 
 testtemp.png
 
-dist/misc/
+dist/misc/config.json
 
-src/misc/
+src/misc/config.json
+
+node_modules/
