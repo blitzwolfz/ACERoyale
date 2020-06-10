@@ -2,7 +2,7 @@ import * as discord from "discord.js"
 import {getUser} from "../misc/utils"
 import {prefix} from "../misc/config.json"
 import {activematch} from "../misc/struct"
-import { endmatch, end } from "./winner"
+import { end } from "./winner"
 
 export async function start(message: discord.Message, client: discord.Client, matches: activematch[]){
     //.start @user1 @user2
@@ -11,7 +11,7 @@ export async function start(message: discord.Message, client: discord.Client, ma
     var args: Array<string> = message.content.slice(prefix.length).trim().split(/ +/g)
     
     if (args.length < 3) {
-        return message.reply("invalid response. Command is `.start @user1 @user2 template link`\n or `.start @user1 @user2 theme theme description`")
+        return message.reply("invalid response. Command is `.start @user1 @user2 template link`\n or `.start @user1 @user2 theme description`")
     }
     
     //console.log(args)
@@ -27,10 +27,8 @@ export async function start(message: discord.Message, client: discord.Client, ma
 
     let newmatch:activematch = {
         channelid:message.channel.id,
-        matchdone: false,
         p1:{
             userid: user1,
-            username: user1.username,
             memedone: false,
             time: Date.now(),
             memelink: "",
@@ -38,7 +36,6 @@ export async function start(message: discord.Message, client: discord.Client, ma
         },
         p2:{
             userid: user2,
-            username: user2.username,
             memedone: false,
             time: Math.floor(Date.now() / 1000),
             memelink: "",
@@ -114,7 +111,6 @@ export async function running(messages: discord.Message, matches: activematch[],
                 .setTimestamp()
 
                 channelid.send(embed)
-                match.matchdone = true
             }
 
             if((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false){
@@ -127,7 +123,6 @@ export async function running(messages: discord.Message, matches: activematch[],
                 .setTimestamp()
 
                 channelid.send(embed)
-                match.matchdone = true
             }
 
             if(((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)){
@@ -140,7 +135,6 @@ export async function running(messages: discord.Message, matches: activematch[],
                 .setTimestamp()
 
                 channelid.send(embed)
-                match.matchdone = true
             }
 
             if(((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)){
