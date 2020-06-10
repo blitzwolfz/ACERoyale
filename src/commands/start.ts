@@ -57,7 +57,7 @@ export async function start(message: discord.Message, client: discord.Client){
     message.channel.send({embed})
     
     if (["t", "template"].includes(args[3])){
-        let att = new discord.Attachment("testtemp.png")
+        let att = new discord.Attachment(message.attachments.array()[0].url)
         await user1.send("Here is your template:")
         await user1.send(att)
         
@@ -87,7 +87,7 @@ export async function start(message: discord.Message, client: discord.Client){
 export async function running(messages: discord.Message, matches: activematch[], client: discord.Client){
     for (const match of matches){
         console.log(Math.floor(Date.now() / 1000) - match.votetime)
-        console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 35)
+        console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 120)
         let channelid = <discord.TextChannel>client.channels.get(match.channelid)
 
         // if((match.p2.memedone === true) && (match.p1.memedone === true)){
@@ -148,10 +148,10 @@ export async function running(messages: discord.Message, matches: activematch[],
                 let embed2 = new discord.RichEmbed()
                 .setImage(match.p2.memelink)
                 .setTimestamp()
-    
+                
                 let embed3 = new discord.RichEmbed()
                 .setTitle("Please vote")
-                .setDescription("Vote for Meme 1 reacting with 1\nMeme 2 by reacting with 2")
+                .setDescription("Vote for Meme 1 reacting with 🅰️\nMeme 2 by reacting with 🅱️")
     
                 await channelid.send(embed1)
                 await channelid.send(embed2)
@@ -161,6 +161,8 @@ export async function running(messages: discord.Message, matches: activematch[],
                     await (msg as discord.Message).react("🅰️")
                     await (msg as discord.Message).react("🅱️")
                 })
+
+                await channelid.send("@eveyone")
                 
                 // channelid.fetchMessages({ limit: 1 }).then(messages => {
                 //     let lastMessage = messages.first();
@@ -179,7 +181,7 @@ export async function running(messages: discord.Message, matches: activematch[],
 
         if(match.votingperiod === true){
             //7200
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 35)){
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 120)){
                 end(messages, matches, client)
             }
         }
