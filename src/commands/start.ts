@@ -33,6 +33,7 @@ export async function start(message: discord.Message, client: discord.Client, ma
             time: Date.now(),
             memelink: "",
             votes: 0,
+            voters: [],
         },
         p2:{
             userid: user2,
@@ -40,6 +41,7 @@ export async function start(message: discord.Message, client: discord.Client, ma
             time: Math.floor(Date.now() / 1000),
             memelink: "",
             votes: 0,
+            voters: [],
         },
         votetime: Math.floor(Date.now() / 1000),
         votingperiod: false,

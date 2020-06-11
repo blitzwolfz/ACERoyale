@@ -33,6 +33,7 @@ async function start(message, client, matches) {
             time: Date.now(),
             memelink: "",
             votes: 0,
+            voters: [],
         },
         p2: {
             userid: user2,
@@ -40,6 +41,7 @@ async function start(message, client, matches) {
             time: Math.floor(Date.now() / 1000),
             memelink: "",
             votes: 0,
+            voters: [],
         },
         votetime: Math.floor(Date.now() / 1000),
         votingperiod: false,

@@ -7,6 +7,7 @@ export interface activematch {
         time: number;
         memelink: string;
         votes: number;
+        voters: Array<string>;
     };
     p2: {
         userid: discord.User;
@@ -14,6 +15,7 @@ export interface activematch {
         time: number;
         memelink: string;
         votes: number;
+        voters: Array<string>;
     };
     votetime: number;
     votingperiod: boolean;

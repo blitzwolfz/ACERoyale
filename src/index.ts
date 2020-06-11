@@ -7,9 +7,23 @@ import { endmatch } from "./commands/winner";
 
 console.log("Hello World, bot has begun life");
 
+const express = require('express');
+const app = express();
+app.use(express.static('public'));
+const http = require('http');
+//@ts-ignore
+var _server = http.createServer(app);
 const client = new Discord.Client();
 
+app.get('/', (_request: any, response: any) => {
+    response.sendFile(__dirname + "/index.html");
+    console.log(Date.now() + " Ping Received");
+    response.sendStatus(200);
+});
 
+const listener = app.listen(process.env.PORT, () => {
+    console.log('Your app is listening on port ' + listener.address().port);
+});
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user?.tag}`);
@@ -24,29 +38,46 @@ client.on("messageReactionAdd", async function(messageReaction, user){
 
   if(matches){
     for (const match of matches){
+      console.log(match.p1.voters)
+      console.log(match.p2.voters)
       let id = client.channels.get(messageReaction.message.channel.id)?.id
 
       if(match.channelid === id){
         if (messageReaction.emoji.name === "🅱️"){
-          match.p2.votes += 1
+          if(!match.p2.voters.includes(user.id)){
+            match.p2.votes += 1
+            match.p2.voters.push(user.id)
+          }
+          else if(match.p1.voters.includes(user.id)){
+            match.p1.voters.splice(match.p1.voters.indexOf(user.id), 1)
+            match.p2.votes += 1
+            match.p1.votes -= 1
+            match.p2.voters.push(user.id)
+
+          }
+          
           await messageReaction.remove(user.id)
           await messageReaction.message.react("🅱️")
         }
 
         else if (messageReaction.emoji.name === "🅰️"){
-          match.p1.votes += 1
+          if(!match.p1.voters.includes(user.id)){
+            match.p1.votes += 1
+            match.p1.voters.push(user.id)
+          }
+          else if(match.p2.voters.includes(user.id)){
+            match.p2.voters.splice(match.p2.voters.indexOf(user.id), 1)
+            match.p1.votes += 1
+            match.p2.votes -= 1
+            match.p1.voters.push(user.id)
+
+          }
           await messageReaction.remove(user.id)
-          await messageReaction.message.react("🅰️")
+          await messageReaction.message.react("🅱️")
         }
       }
-
     }
-    return;
   }
-  else{
-    return;
-  }
-
 });
 
 
@@ -58,7 +89,7 @@ client.on("message", async message => {
   }
 
   const prefix = config.prefix;
-  //console.log(matches)
+  console.log(matches)
   
   running(message, matches, client)
 
