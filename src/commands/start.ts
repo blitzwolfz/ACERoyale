@@ -26,17 +26,17 @@ export async function start(message: discord.Message, client: discord.Client){
     let user1 = (await client.fetchUser(users[0]))
     let user2 = (await client.fetchUser(users[1]))
 
-    let newmatch:activematch = {
+    const newmatch:activematch = {
         channelid:message.channel.id,
         p1:{
-            userid: user1,
+            userid: user1.id,
             memedone: false,
             time: Date.now(),
             memelink: "",
             votes: 0,
         },
         p2:{
-            userid: user2,
+            userid: user2.id,
             memedone: false,
             time: Math.floor(Date.now() / 1000),
             memelink: "",
@@ -54,7 +54,7 @@ export async function start(message: discord.Message, client: discord.Client){
     
     
     
-    message.channel.send({embed})
+    await message.channel.send({embed})
     
     if (["t", "template"].includes(args[3])){
         let att = new discord.Attachment(message.attachments.array()[0].url)
@@ -81,7 +81,7 @@ export async function start(message: discord.Message, client: discord.Client){
 
     // return matches;
 
-    await addMatch(newmatch)
+    console.log(await addMatch(newmatch))
 }
 
 export async function running(messages: discord.Message, matches: activematch[], client: discord.Client){

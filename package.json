@@ -20,6 +20,6 @@
     "@discordjs/uws": "^10.149.0",
     "@types/mongodb": "^3.5.20",
     "discord.js": "^11.5.1",
-    "mongodb": "^3.5.8"
+    "mongodb": "^3.5.5"
   }
 }

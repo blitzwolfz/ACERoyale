@@ -26,17 +26,17 @@ async function start(message, client) {
     }
     let user1 = (await client.fetchUser(users[0]));
     let user2 = (await client.fetchUser(users[1]));
-    let newmatch = {
+    const newmatch = {
         channelid: message.channel.id,
         p1: {
-            userid: user1,
+            userid: user1.id,
             memedone: false,
             time: Date.now(),
             memelink: "",
             votes: 0,
         },
         p2: {
-            userid: user2,
+            userid: user2.id,
             memedone: false,
             time: Math.floor(Date.now() / 1000),
             memelink: "",
@@ -49,7 +49,7 @@ async function start(message, client) {
         .setTitle(`Match between ${user1.username} and ${user2.username}`)
         .setDescription(`<@${user1.id}> and <@${user2.id}> both have 30 mins to complete your memes.\n Contact admins if you have an issue.`)
         .setTimestamp();
-    message.channel.send({ embed });
+    await message.channel.send({ embed });
     if (["t", "template"].includes(args[3])) {
         let att = new discord.Attachment(message.attachments.array()[0].url);
         await user1.send("Here is your template:");
@@ -61,7 +61,7 @@ async function start(message, client) {
         await user1.send(`Your theme is: ${args[4]}`);
         await user2.send(`Your theme is: ${args[4]}`);
     }
-    await db_1.addMatch(newmatch);
+    console.log(await db_1.addMatch(newmatch));
 }
 exports.start = start;
 async function running(messages, matches, client) {

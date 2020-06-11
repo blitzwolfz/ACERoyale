@@ -15,10 +15,10 @@ const winner_1 = require("./commands/winner");
 const db_1 = require("./misc/db");
 console.log("Hello World, bot has begun life");
 const client = new Discord.Client();
-client.on('ready', () => {
+client.on('ready', async () => {
     var _a;
-    console.log(`Logged in as ${(_a = client.user) === null || _a === void 0 ? void 0 : _a.tag}`);
-    db_1.connectToDB();
+    await db_1.connect();
+    console.log(`Logged in as ${(_a = client.user) === null || _a === void 0 ? void 0 : _a.tag}\n`);
 });
 let matches = [];
 client.on("messageReactionAdd", async function (messageReaction, user) {

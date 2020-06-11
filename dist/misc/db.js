@@ -10,12 +10,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb = __importStar(require("mongodb"));
 const config_json_1 = require("./config.json");
 const url = config_json_1.db.mongoQuery;
-const client = new mongodb.MongoClient(url, { useNewUrlParser: true });
 const dbName = config_json_1.db.name;
+const MongoClient = mongodb.MongoClient;
+const client = new MongoClient(url, { useNewUrlParser: true });
+async function connect() {
+    return new Promise(resolve => {
+        client.connect(async (err) => {
+            if (err)
+                throw err;
+            client.db(dbName).createCollection("activematches");
+            console.log("Successfully connected");
+            resolve();
+        });
+    });
+}
+exports.connect = connect;
 async function addMatch(match) {
-    let result = await client.db(dbName).collection("activematches").insertOne(match);
-    if (result)
-        console.log("Successfully added match");
+    await client.db(dbName).collection("activematches").insertOne({ match });
+    await console.log("Successfully added match");
 }
 exports.addMatch = addMatch;
 async function getMatch(channelid) {
@@ -28,15 +40,3 @@ async function deleteMatch(channelid) {
         console.log("Match is done");
 }
 exports.deleteMatch = deleteMatch;
-async function connectToDB() {
-    return new Promise(resolve => {
-        client.connect(async (e) => {
-            if (e)
-                throw e;
-            console.log("Successfully connected to database");
-            client.db(dbName).createCollection("activematches");
-            resolve();
-        });
-    });
-}
-exports.connectToDB = connectToDB;
