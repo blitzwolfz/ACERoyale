@@ -26,17 +26,26 @@ async function connect() {
 }
 exports.connect = connect;
 async function addMatch(match) {
-    await client.db(dbName).collection("activematches").insertOne({ match });
+    await client.db(dbName).collection("activematches").insertOne({ _id: match.channelid, match });
     await console.log("Successfully added match");
 }
 exports.addMatch = addMatch;
 async function getMatch(channelid) {
-    return await client.db(dbName).collection("activematches").findOne({ channelid });
+    let mat = await client.db(dbName).collection("activematches").findOne({ _id: channelid });
+    return await mat.match;
 }
 exports.getMatch = getMatch;
+async function getallMatch() {
+    return await client.db(dbName).collection("activematches").find({}, { projection: { _id: 0 } }).toArray();
+}
+exports.getallMatch = getallMatch;
 async function deleteMatch(channelid) {
     let result = await client.db(dbName).collection("activematches").deleteOne({ channelid });
     if (result)
         console.log("Match is done");
 }
 exports.deleteMatch = deleteMatch;
+async function updateMemeLink(channelid, links, memedone) {
+    await client.db(dbName).collection("contracts").replaceOne({ _id: channelid }, { $set: { memedone, links } });
+}
+exports.updateMemeLink = updateMemeLink;

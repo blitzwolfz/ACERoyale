@@ -4,21 +4,21 @@ import {activematch} from "./misc/struct"
 import {submit} from "./commands/submit"
 import { start, running } from "./commands/start";
 import { endmatch } from "./commands/winner";
-import { connect } from "./misc/db";
+import { connect, getallMatch, getMatch } from "./misc/db";
 
 console.log("Hello World, bot has begun life");
 
 const client = new Discord.Client();
-
+let matches:activematch[]
 
 
 client.on('ready', async () => {
     await connect()
     console.log(`Logged in as ${client.user?.tag}\n`);
-    
+    matches = await getallMatch()
 });
 
-let matches:activematch[] = []
+
 
 client.on("messageReactionAdd", async function(messageReaction, user){
   console.log(`a reaction is added to a message`);
@@ -42,12 +42,8 @@ client.on("messageReactionAdd", async function(messageReaction, user){
           await messageReaction.message.react("🅰️")
         }
       }
-
     }
-    return;
-  }
-  else{
-    return;
+    
   }
 
 });
@@ -61,9 +57,11 @@ client.on("message", async message => {
   }
 
   const prefix = config.prefix;
-  //console.log(matches)
+  console.log(matches)
+  //matches = await getallMatch()
   
-  running(message, matches, client)
+  matches = await getallMatch()
+  //running(message, matches, client)
 
   if (message.content.indexOf(prefix) !== 0 || message.author.bot){
     return;
@@ -90,7 +88,7 @@ client.on("message", async message => {
   }
 
   else if(command === "submit"){
-    submit(message, matches)
+    submit(message, matches, client)
   }
 
   else if(command === "start"){
@@ -99,6 +97,11 @@ client.on("message", async message => {
 
   else if(command === "end"){
     endmatch(message, matches, client)
+  }
+
+  else if(command === "testget"){
+    let g = await getMatch(message.channel.id)
+    console.log(g)
   }
 
   

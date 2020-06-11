@@ -15,12 +15,13 @@ const winner_1 = require("./commands/winner");
 const db_1 = require("./misc/db");
 console.log("Hello World, bot has begun life");
 const client = new Discord.Client();
+let matches;
 client.on('ready', async () => {
     var _a;
     await db_1.connect();
     console.log(`Logged in as ${(_a = client.user) === null || _a === void 0 ? void 0 : _a.tag}\n`);
+    matches = await db_1.getallMatch();
 });
-let matches = [];
 client.on("messageReactionAdd", async function (messageReaction, user) {
     var _a;
     console.log(`a reaction is added to a message`);
@@ -42,10 +43,6 @@ client.on("messageReactionAdd", async function (messageReaction, user) {
                 }
             }
         }
-        return;
-    }
-    else {
-        return;
     }
 });
 client.on("message", async (message) => {
@@ -54,7 +51,8 @@ client.on("message", async (message) => {
         return;
     }
     const prefix = config.prefix;
-    start_1.running(message, matches, client);
+    console.log(matches);
+    matches = await db_1.getallMatch();
     if (message.content.indexOf(prefix) !== 0 || message.author.bot) {
         return;
     }
@@ -73,13 +71,17 @@ client.on("message", async (message) => {
         m.edit(`Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`);
     }
     else if (command === "submit") {
-        submit_1.submit(message, matches);
+        submit_1.submit(message, matches, client);
     }
     else if (command === "start") {
         start_1.start(message, client);
     }
     else if (command === "end") {
         winner_1.endmatch(message, matches, client);
+    }
+    else if (command === "testget") {
+        let g = await db_1.getMatch(message.channel.id);
+        console.log(g);
     }
 });
 client.login(config.token);

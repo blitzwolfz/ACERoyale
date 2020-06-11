@@ -30,15 +30,29 @@ export async function connect(): Promise<void>{
 }
 
 export async function addMatch(match: activematch){
-    await client.db(dbName).collection("activematches").insertOne({match})
+    await client.db(dbName).collection("activematches").insertOne({_id:match.channelid, match})
     await console.log("Successfully added match");
 }
 
 export async function getMatch(channelid: string): Promise<activematch> {
-    return await client.db(dbName).collection("activematches").findOne({ channelid })!;
+    //return 
+    let mat = await client.db(dbName).collection("activematches").findOne({ _id: channelid })!;
+    return await mat.match
 }
+
+export async function getallMatch(): Promise<activematch[]> {
+    return await client.db(dbName).collection("activematches").find({}, {projection:{ _id: 0 }}).toArray();
+}
+
+// export async function updateMatch(channelid: string): Promise<void> {
+//     await client.db(dbName).collection("activematches").updateOne({ _id: channelid }, { $set: { ["info.totaltime"]: value } })!;
+// }
 
 export async function deleteMatch(channelid: string): Promise<void>{
     let result = await client.db(dbName).collection("activematches").deleteOne({ channelid});
     if (result) console.log("Match is done")
+}
+
+export async function updateMemeLink(channelid: string, links: string, memedone: boolean) {
+    await client.db(dbName).collection("contracts").replaceOne({_id: channelid}, {$set: {memedone, links}})!;
 }

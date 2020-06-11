@@ -7,12 +7,14 @@ export async function endmatch(message: discord.Message, matches: activematch[],
     
     for (const match of matches){
         let channelid = <discord.TextChannel>client.channels.get(match.channelid)
+        let user1 = (await client.fetchUser(match.p1.userid))
+        let user2 = (await client.fetchUser(match.p2.userid))
 
         if (message.channel.id === channelid.id){
             if(match.p1.votes > match.p2.votes){
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                .setDescription(`<@${match.p1.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+                .setTitle(`Match between ${user1.username} and ${user2.username}`)
+                .setDescription(`<@${user1.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
                 .setTimestamp()
     
                 channelid.send(embed)
@@ -21,8 +23,8 @@ export async function endmatch(message: discord.Message, matches: activematch[],
     
             else if(match.p1.votes < match.p2.votes){
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                .setDescription(`<@${match.p2.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+                .setTitle(`Match between ${user1.username} and ${user2.username}`)
+                .setDescription(`<@${user2.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
                 .setTimestamp()
                 
                 channelid.send(embed)
@@ -30,7 +32,7 @@ export async function endmatch(message: discord.Message, matches: activematch[],
 
             else if(match.p1.votes === match.p2.votes){
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
+                .setTitle(`Match between ${user1.username} and ${user2.username}`)
                 .setDescription(`Both users have come to a draw.\nPlease find a new time for your rematch.`)
                 .setTimestamp()
                 
@@ -51,10 +53,13 @@ export async function end(message:discord.Message, matches: activematch[], clien
         console.log(Math.floor(Date.now() / 1000) - match.votetime)
         console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 35)
 
+        let user1 = (await client.fetchUser(match.p1.userid))
+        let user2 = (await client.fetchUser(match.p2.userid))
+
             if(match.p1.votes > match.p2.votes){
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                .setDescription(`<@${match.p1.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+                .setTitle(`Match between ${user1.username} and ${user2.username}`)
+                .setDescription(`<@${user1.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
                 .setTimestamp()
     
                 channelid.send(embed)
@@ -63,8 +68,8 @@ export async function end(message:discord.Message, matches: activematch[], clien
     
             else if(match.p1.votes < match.p2.votes){
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                .setDescription(`<@${match.p2.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+                .setTitle(`Match between ${user1.username} and ${user2.username}`)
+                .setDescription(`<@${user2.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
                 .setTimestamp()
                 
                 channelid.send(embed)
@@ -72,7 +77,7 @@ export async function end(message:discord.Message, matches: activematch[], clien
 
             else if(match.p1.votes === match.p2.votes){
                 let embed = new discord.RichEmbed()
-                .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
+                .setTitle(`Match between ${user1.username} and ${user2.username}`)
                 .setDescription(`Both users have come to a draw.\nPlease find a new time for your rematch.`)
                 .setTimestamp()
                 
