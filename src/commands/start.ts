@@ -3,6 +3,7 @@ import {getUser} from "../misc/utils"
 import {prefix} from "../misc/config.json"
 import {activematch} from "../misc/struct"
 import { end } from "./winner"
+import { vs } from "./card"
 
 export async function start(message: discord.Message, client: discord.Client, matches: activematch[]){
     //.start @user1 @user2
@@ -30,7 +31,7 @@ export async function start(message: discord.Message, client: discord.Client, ma
         p1:{
             userid: user1,
             memedone: false,
-            time: Date.now(),
+            time: Math.floor(Date.now() / 1000),
             memelink: "",
             votes: 0,
             voters: [],
@@ -47,6 +48,8 @@ export async function start(message: discord.Message, client: discord.Client, ma
         votingperiod: false,
         // votemessage: null,
     }
+
+    await vs(message, client, users)
 
     let embed = new discord.RichEmbed()
     .setTitle(`Match between ${user1.username} and ${user2.username}`)
@@ -83,10 +86,10 @@ export async function start(message: discord.Message, client: discord.Client, ma
     return matches;
 }
 
-export async function running(messages: discord.Message, matches: activematch[], client: discord.Client){
+export async function running(matches: activematch[], client: discord.Client){
     for (const match of matches){
         console.log(Math.floor(Date.now() / 1000) - match.votetime)
-        console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 120)
+        console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 1800)
         let channelid = <discord.TextChannel>client.channels.get(match.channelid)
 
         // if((match.p2.memedone === true) && (match.p1.memedone === true)){
@@ -115,7 +118,7 @@ export async function running(messages: discord.Message, matches: activematch[],
                 channelid.send(embed)
             }
 
-            if((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false){
+            else if((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false){
                 console.log(Date.now() - match.p2.time)
                 match.p2.userid.send("You have failed to submit your meme, your opponet is the winner.")
 
@@ -127,7 +130,7 @@ export async function running(messages: discord.Message, matches: activematch[],
                 channelid.send(embed)
             }
 
-            if(((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)){
+            else if(((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)){
                 match.p1.userid.send("You have failed to submit your meme")
                 match.p2.userid.send("You have failed to submit your meme")
 
@@ -138,8 +141,10 @@ export async function running(messages: discord.Message, matches: activematch[],
 
                 channelid.send(embed)
             }
+            
+            
 
-            if(((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)){
+            else if(((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)){
                 let embed1 = new discord.RichEmbed()
                 .setImage(match.p1.memelink)
                 .setTimestamp()
@@ -161,7 +166,7 @@ export async function running(messages: discord.Message, matches: activematch[],
                     await (msg as discord.Message).react("🅱️")
                 })
 
-                await channelid.send("@eveyone")
+                await channelid.send("@everyone")
                 
                 // channelid.fetchMessages({ limit: 1 }).then(messages => {
                 //     let lastMessage = messages.first();
@@ -180,8 +185,8 @@ export async function running(messages: discord.Message, matches: activematch[],
 
         if(match.votingperiod === true){
             //7200
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 120)){
-                end(messages, matches, client)
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 1800)){
+                end(matches, client)
             }
         }
     }

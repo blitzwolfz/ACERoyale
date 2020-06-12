@@ -12,6 +12,8 @@ const config = __importStar(require("./misc/config.json"));
 const submit_1 = require("./commands/submit");
 const start_1 = require("./commands/start");
 const winner_1 = require("./commands/winner");
+const card_1 = require("./commands/card");
+const utils_1 = require("./misc/utils");
 console.log("Hello World, bot has begun life");
 const express = require('express');
 const app = express();
@@ -43,34 +45,52 @@ client.on("messageReactionAdd", async function (messageReaction, user) {
             console.log(match.p2.voters);
             let id = (_a = client.channels.get(messageReaction.message.channel.id)) === null || _a === void 0 ? void 0 : _a.id;
             if (match.channelid === id) {
-                if (messageReaction.emoji.name === "🅱️") {
-                    if (!match.p2.voters.includes(user.id)) {
+                if (!match.p1.voters.includes(user.id) && !match.p2.voters.includes(user.id)) {
+                    if (messageReaction.emoji.name === "🅱️") {
                         match.p2.votes += 1;
                         match.p2.voters.push(user.id);
+                        await messageReaction.remove(user.id);
+                        await messageReaction.message.react("🅱️");
                     }
-                    else if (match.p1.voters.includes(user.id)) {
-                        match.p1.voters.splice(match.p1.voters.indexOf(user.id), 1);
+                    else if (messageReaction.emoji.name === "🅰️") {
+                        match.p1.votes += 1;
+                        match.p1.voters.push(user.id);
+                        await messageReaction.remove(user.id);
+                        await messageReaction.message.react("🅱️");
+                    }
+                }
+                else if (match.p1.voters.includes(user.id)) {
+                    if (messageReaction.emoji.name === "🅱️") {
                         match.p2.votes += 1;
+                        match.p2.voters.push(user.id);
                         match.p1.votes -= 1;
-                        match.p2.voters.push(user.id);
+                        match.p1.voters.splice(match.p1.voters.indexOf(user.id), 1);
+                        await messageReaction.remove(user.id);
+                        await messageReaction.message.react("🅱️");
                     }
-                    await messageReaction.remove(user.id);
-                    await messageReaction.message.react("🅱️");
+                    else if (messageReaction.emoji.name === "🅰️") {
+                        await user.send("You can't vote on the same meme twice");
+                        await messageReaction.remove(user.id);
+                        await messageReaction.message.react("🅱️");
+                    }
                 }
-                else if (messageReaction.emoji.name === "🅰️") {
-                    if (!match.p1.voters.includes(user.id)) {
+                else if (match.p2.voters.includes(user.id)) {
+                    if (messageReaction.emoji.name === "🅱️") {
+                        await user.send("You can't vote on the same meme twice");
+                        await messageReaction.remove(user.id);
+                        await messageReaction.message.react("🅱️");
+                    }
+                    else if (messageReaction.emoji.name === "🅰️") {
                         match.p1.votes += 1;
                         match.p1.voters.push(user.id);
-                    }
-                    else if (match.p2.voters.includes(user.id)) {
-                        match.p2.voters.splice(match.p2.voters.indexOf(user.id), 1);
-                        match.p1.votes += 1;
                         match.p2.votes -= 1;
-                        match.p1.voters.push(user.id);
+                        match.p2.voters.splice(match.p1.voters.indexOf(user.id), 1);
+                        await messageReaction.remove(user.id);
+                        await messageReaction.message.react("🅰️");
                     }
-                    await messageReaction.remove(user.id);
-                    await messageReaction.message.react("🅱️");
                 }
+                console.log(match.p1.voters);
+                console.log(match.p2.voters);
             }
         }
     }
@@ -82,7 +102,7 @@ client.on("message", async (message) => {
     }
     const prefix = config.prefix;
     console.log(matches);
-    start_1.running(message, matches, client);
+    start_1.running(matches, client);
     if (message.content.indexOf(prefix) !== 0 || message.author.bot) {
         return;
     }
@@ -96,6 +116,7 @@ client.on("message", async (message) => {
         return;
     }
     ;
+    console.log(matches);
     if (command === "ping") {
         const m = await message.channel.send("Ping?");
         m.edit(`Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`);
@@ -107,7 +128,20 @@ client.on("message", async (message) => {
         start_1.start(message, client, matches);
     }
     else if (command === "end") {
+        if (message.author.id !== "239516219445608449") {
+            return;
+        }
         winner_1.endmatch(message, matches, client);
+    }
+    else if (command === "vs") {
+        let users = [];
+        for (let i = 0; i < args.length; i++) {
+            let userid = await utils_1.getUser(args[i]);
+            if (userid) {
+                users.push(userid);
+            }
+        }
+        await card_1.vs(message, client, users);
     }
 });
 client.login(config.token);

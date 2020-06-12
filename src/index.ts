@@ -4,6 +4,8 @@ import {activematch} from "./misc/struct"
 import {submit} from "./commands/submit"
 import { start, running } from "./commands/start";
 import { endmatch } from "./commands/winner";
+import { vs } from "./commands/card";
+import { getUser } from "./misc/utils";
 
 console.log("Hello World, bot has begun life");
 
@@ -43,41 +45,71 @@ client.on("messageReactionAdd", async function(messageReaction, user){
       let id = client.channels.get(messageReaction.message.channel.id)?.id
 
       if(match.channelid === id){
-        if (messageReaction.emoji.name === "🅱️"){
-          if(!match.p2.voters.includes(user.id)){
+        
+        if(!match.p1.voters.includes(user.id) && !match.p2.voters.includes(user.id)){
+          if (messageReaction.emoji.name === "🅱️"){
             match.p2.votes += 1
             match.p2.voters.push(user.id)
+  
+            await messageReaction.remove(user.id)
+            await messageReaction.message.react("🅱️")
           }
-          else if(match.p1.voters.includes(user.id)){
-            match.p1.voters.splice(match.p1.voters.indexOf(user.id), 1)
+  
+          else if (messageReaction.emoji.name === "🅰️"){
+            match.p1.votes += 1
+            match.p1.voters.push(user.id)
+  
+            await messageReaction.remove(user.id)
+            await messageReaction.message.react("🅱️")
+          }
+        }
+
+        else if(match.p1.voters.includes(user.id)){
+          if (messageReaction.emoji.name === "🅱️"){
             match.p2.votes += 1
+            match.p2.voters.push(user.id)
+            
             match.p1.votes -= 1
-            match.p2.voters.push(user.id)
+            match.p1.voters.splice(match.p1.voters.indexOf(user.id), 1)
 
+            await messageReaction.remove(user.id)
+            await messageReaction.message.react("🅱️")
           }
-          
-          await messageReaction.remove(user.id)
-          await messageReaction.message.react("🅱️")
+  
+          else if (messageReaction.emoji.name === "🅰️"){
+            await user.send("You can't vote on the same meme twice") 
+            await messageReaction.remove(user.id)
+            await messageReaction.message.react("🅱️")
+          }
         }
 
-        else if (messageReaction.emoji.name === "🅰️"){
-          if(!match.p1.voters.includes(user.id)){
+        else if(match.p2.voters.includes(user.id)){
+          if (messageReaction.emoji.name === "🅱️"){
+            await user.send("You can't vote on the same meme twice") 
+            await messageReaction.remove(user.id)
+            await messageReaction.message.react("🅱️")
+
+          }
+  
+          else if (messageReaction.emoji.name === "🅰️"){
             match.p1.votes += 1
             match.p1.voters.push(user.id)
-          }
-          else if(match.p2.voters.includes(user.id)){
-            match.p2.voters.splice(match.p2.voters.indexOf(user.id), 1)
-            match.p1.votes += 1
+            
             match.p2.votes -= 1
-            match.p1.voters.push(user.id)
+            match.p2.voters.splice(match.p1.voters.indexOf(user.id), 1)
 
+            await messageReaction.remove(user.id)
+            await messageReaction.message.react("🅰️")
           }
-          await messageReaction.remove(user.id)
-          await messageReaction.message.react("🅱️")
         }
+        console.log(match.p1.voters)
+        console.log(match.p2.voters)
       }
+      
     }
+    
   }
+
 });
 
 
@@ -91,7 +123,7 @@ client.on("message", async message => {
   const prefix = config.prefix;
   console.log(matches)
   
-  running(message, matches, client)
+  running(matches, client)
 
   if (message.content.indexOf(prefix) !== 0 || message.author.bot){
     return;
@@ -110,7 +142,7 @@ client.on("message", async message => {
     return
   };
   
-  //console.log(matches)
+  console.log(matches)
 
   if (command === "ping") {
     const m: Discord.Message = await message.channel.send("Ping?") as Discord.Message;
@@ -126,7 +158,22 @@ client.on("message", async message => {
   }
 
   else if(command === "end"){
+    if (message.author.id !== "239516219445608449"){
+      return
+    }
     endmatch(message, matches, client)
+  }
+
+  else if(command === "vs"){
+    let users: Array<string> = []
+    
+    for (let i = 0; i < args.length; i++){
+        let userid = await getUser(args[i])
+        if (userid){
+            users.push(userid)
+        }
+    }
+    await vs(message, client, users)
   }
 
   

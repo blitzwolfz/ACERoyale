@@ -11,6 +11,7 @@ const discord = __importStar(require("discord.js"));
 const utils_1 = require("../misc/utils");
 const config_json_1 = require("../misc/config.json");
 const winner_1 = require("./winner");
+const card_1 = require("./card");
 async function start(message, client, matches) {
     let users = [];
     var args = message.content.slice(config_json_1.prefix.length).trim().split(/ +/g);
@@ -30,7 +31,7 @@ async function start(message, client, matches) {
         p1: {
             userid: user1,
             memedone: false,
-            time: Date.now(),
+            time: Math.floor(Date.now() / 1000),
             memelink: "",
             votes: 0,
             voters: [],
@@ -46,6 +47,7 @@ async function start(message, client, matches) {
         votetime: Math.floor(Date.now() / 1000),
         votingperiod: false,
     };
+    await card_1.vs(message, client, users);
     let embed = new discord.RichEmbed()
         .setTitle(`Match between ${user1.username} and ${user2.username}`)
         .setDescription(`<@${user1.id}> and <@${user2.id}> both have 30 mins to complete your memes.\n Contact admins if you have an issue.`)
@@ -66,10 +68,10 @@ async function start(message, client, matches) {
     return matches;
 }
 exports.start = start;
-async function running(messages, matches, client) {
+async function running(matches, client) {
     for (const match of matches) {
         console.log(Math.floor(Date.now() / 1000) - match.votetime);
-        console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 120);
+        console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 1800);
         let channelid = client.channels.get(match.channelid);
         if (match.votingperiod === false) {
             if ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false) {
@@ -80,7 +82,7 @@ async function running(messages, matches, client) {
                     .setTimestamp();
                 channelid.send(embed);
             }
-            if ((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) {
+            else if ((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) {
                 console.log(Date.now() - match.p2.time);
                 match.p2.userid.send("You have failed to submit your meme, your opponet is the winner.");
                 let embed = new discord.RichEmbed()
@@ -89,7 +91,7 @@ async function running(messages, matches, client) {
                     .setTimestamp();
                 channelid.send(embed);
             }
-            if (((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)) {
+            else if (((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)) {
                 match.p1.userid.send("You have failed to submit your meme");
                 match.p2.userid.send("You have failed to submit your meme");
                 let embed = new discord.RichEmbed()
@@ -98,7 +100,7 @@ async function running(messages, matches, client) {
                     .setTimestamp();
                 channelid.send(embed);
             }
-            if (((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)) {
+            else if (((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)) {
                 let embed1 = new discord.RichEmbed()
                     .setImage(match.p1.memelink)
                     .setTimestamp();
@@ -114,14 +116,14 @@ async function running(messages, matches, client) {
                     await msg.react("🅰️");
                     await msg.react("🅱️");
                 });
-                await channelid.send("@eveyone");
+                await channelid.send("@everyone");
                 match.votingperiod = true;
                 match.votetime = (Math.floor(Date.now() / 1000));
             }
         }
         if (match.votingperiod === true) {
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 120)) {
-                winner_1.end(messages, matches, client);
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 1800)) {
+                winner_1.end(matches, client);
             }
         }
     }
