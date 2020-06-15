@@ -145,48 +145,50 @@ export async function running(matches: activematch[], client: discord.Client):Pr
             
 
             else if(((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)){
-                let embed1 = new discord.RichEmbed()
-                .setImage(match.p1.memelink)
-                .setTimestamp()
+                    channelid.send(`/poll "Vote for best meme" "Image A" "Image B"`)
+        //         let embed1 = new discord.RichEmbed()
+        //         .setImage(match.p1.memelink)
+        //         .setTimestamp()
     
-                let embed2 = new discord.RichEmbed()
-                .setImage(match.p2.memelink)
-                .setTimestamp()
+        //         let embed2 = new discord.RichEmbed()
+        //         .setImage(match.p2.memelink)
+        //         .setTimestamp()
                 
-                let embed3 = new discord.RichEmbed()
-                .setTitle("Please vote")
-                .setDescription("Vote for Meme 1 reacting with 🅰️\nMeme 2 by reacting with 🅱️")
+        //         let embed3 = new discord.RichEmbed()
+        //         .setTitle("Please vote")
+        //         .setDescription("Vote for Meme 1 reacting with 🅰️\nMeme 2 by reacting with 🅱️")
     
-                await channelid.send(embed1)
-                await channelid.send(embed2)
-                //await channelid.send(embed3)
+        //         await channelid.send(embed1)
+        //         await channelid.send(embed2)
+        //         //await channelid.send(embed3)
     
-                await channelid.send(embed3).then(async msg => {
-                    await (msg as discord.Message).react("🅰️")
-                    await (msg as discord.Message).react("🅱️")
-                })
+        //         await channelid.send(embed3).then(async msg => {
+        //             await (msg as discord.Message).react("🅰️")
+        //             await (msg as discord.Message).react("🅱️")
+        //         })
 
-                await channelid.send("@eveyone")
+        //         //await channelid.send("@eveyone")
                 
-                // channelid.fetchMessages({ limit: 1 }).then(messages => {
-                //     let lastMessage = messages.first();
-                //     match.votemessage = lastMessage
-                // })
+        //         // channelid.fetchMessages({ limit: 1 }).then(messages => {
+        //         //     let lastMessage = messages.first();
+        //         //     match.votemessage = lastMessage
+        //         // })
 
-                //console.log(match.votemessage?.content)
+        //         //console.log(match.votemessage?.content)
 
-                match.votingperiod = true
-                match.votetime = (Math.floor(Date.now() / 1000))
-                // let messages: discord.Collection < string, discord.Message > = await channelid.fetchMessage(channelid.id)
+        //         match.votingperiod = true
+        //         match.votetime = (Math.floor(Date.now() / 1000))
+        //         // let messages: discord.Collection < string, discord.Message > = await channelid.fetchMessage(channelid.id)
     
-                // let react = messages.last().id
-            }
-        }
+        //         // let react = messages.last().id
+        //     }
+        // }
 
-        if(match.votingperiod === true){
-            //7200
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 3600)){
-                await end(matches, client)
+        // if(match.votingperiod === true){
+        //     //7200
+        //     if ((Math.floor(Date.now() / 1000) - match.votetime >= 3600)){
+        //         await end(matches, client)
+        //     }
             }
         }
     }

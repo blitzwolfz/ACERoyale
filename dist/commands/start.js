@@ -10,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord = __importStar(require("discord.js"));
 const utils_1 = require("../misc/utils");
 const config_json_1 = require("../misc/config.json");
-const winner_1 = require("./winner");
 const card_1 = require("./card");
 async function start(message, client, matches) {
     let users = [];
@@ -101,29 +100,7 @@ async function running(matches, client) {
                 channelid.send(embed);
             }
             else if (((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)) {
-                let embed1 = new discord.RichEmbed()
-                    .setImage(match.p1.memelink)
-                    .setTimestamp();
-                let embed2 = new discord.RichEmbed()
-                    .setImage(match.p2.memelink)
-                    .setTimestamp();
-                let embed3 = new discord.RichEmbed()
-                    .setTitle("Please vote")
-                    .setDescription("Vote for Meme 1 reacting with 🅰️\nMeme 2 by reacting with 🅱️");
-                await channelid.send(embed1);
-                await channelid.send(embed2);
-                await channelid.send(embed3).then(async (msg) => {
-                    await msg.react("🅰️");
-                    await msg.react("🅱️");
-                });
-                await channelid.send("@eveyone");
-                match.votingperiod = true;
-                match.votetime = (Math.floor(Date.now() / 1000));
-            }
-        }
-        if (match.votingperiod === true) {
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 30)) {
-                await winner_1.end(matches, client);
+                channelid.send(`/poll "Vote for best meme" "Image A" "Image B"`);
             }
         }
     }

@@ -176,7 +176,6 @@ client.on("message", async message => {
     }
     await vs(message, client, users)
   }
-
   
 });
 
