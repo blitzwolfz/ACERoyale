@@ -185,7 +185,7 @@ export async function running(matches: activematch[], client: discord.Client):Pr
 
         if(match.votingperiod === true){
             //7200
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 30)){
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 3600)){
                 await end(matches, client)
             }
         }
