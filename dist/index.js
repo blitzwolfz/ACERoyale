@@ -102,10 +102,10 @@ client.on("message", async (message) => {
     }
     const prefix = config.prefix;
     console.log(matches);
-    start_1.running(matches, client);
     if (message.content.indexOf(prefix) !== 0 || message.author.bot) {
         return;
     }
+    await start_1.running(matches, client);
     var args = message.content.slice(prefix.length).trim().split(/ +/g);
     if (!args || args.length === 0) {
         return;

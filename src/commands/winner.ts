@@ -12,7 +12,7 @@ export async function endmatch(message: discord.Message, matches: activematch[],
             if(match.p1.votes > match.p2.votes){
                 let embed = new discord.RichEmbed()
                 .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                .setDescription(`<@${match.p1.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+                .setDescription(`<@${match.p1.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}\n${match.p1.userid.username} won with image A`)
                 .setTimestamp()
     
                 channelid.send(embed)
@@ -22,7 +22,7 @@ export async function endmatch(message: discord.Message, matches: activematch[],
             else if(match.p1.votes < match.p2.votes){
                 let embed = new discord.RichEmbed()
                 .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                .setDescription(`<@${match.p2.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+                .setDescription(`<@${match.p2.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}\n${match.p2.userid.username} won with image B`)
                 .setTimestamp()
                 
                 channelid.send(embed)
@@ -58,7 +58,7 @@ export async function end(matches: activematch[], client: discord.Client){
             .setDescription(`<@${match.p2.userid.id}> has won!`)
             .setTimestamp()
 
-            channelid.send(embed)
+            await channelid.send(embed)
         }
 
         else if((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false){
@@ -70,7 +70,7 @@ export async function end(matches: activematch[], client: discord.Client){
             .setDescription(`<@${match.p1.userid.username}> has won!`)
             .setTimestamp()
 
-            channelid.send(embed)
+            await channelid.send(embed)
         }
 
         else if(((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)){
@@ -82,26 +82,27 @@ export async function end(matches: activematch[], client: discord.Client){
             .setDescription(`<@${match.p1.userid.id}> & ${match.p2.userid.username}have lost\n for not submitting meme on time`)
             .setTimestamp()
 
-            channelid.send(embed)
+            await channelid.send(embed)
         }
 
         else if(match.p1.votes > match.p2.votes){
             let embed = new discord.RichEmbed()
             .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-            .setDescription(`<@${match.p1.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+            .setDescription(`<@${match.p1.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}\n${match.p1.userid.username} won with image A`)
             .setTimestamp()
 
-            channelid.send(embed)
+            await channelid.send(embed)
+
 
         }
 
         else if(match.p1.votes < match.p2.votes){
             let embed = new discord.RichEmbed()
             .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-            .setDescription(`<@${match.p2.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}`)
+            .setDescription(`<@${match.p2.userid.id}> has won!\n The final votes where ${match.p1.votes} to ${match.p2.votes}\n${match.p2.userid.username} won with image B`)
             .setTimestamp()
             
-            channelid.send(embed)
+            await channelid.send(embed)
         }
 
         else if(match.p1.votes === match.p2.votes){
@@ -110,7 +111,7 @@ export async function end(matches: activematch[], client: discord.Client){
             .setDescription(`Both users have come to a draw.\nPlease find a new time for your rematch.`)
             .setTimestamp()
             
-            channelid.send(embed)
+            await channelid.send(embed)
         }
 
         matches.splice(matches.indexOf(match), 1)

@@ -86,7 +86,7 @@ export async function start(message: discord.Message, client: discord.Client, ma
     return matches;
 }
 
-export async function running(matches: activematch[], client: discord.Client){
+export async function running(matches: activematch[], client: discord.Client):Promise<void>{
     for (const match of matches){
         console.log(Math.floor(Date.now() / 1000) - match.votetime)
         console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 1800)
@@ -166,7 +166,7 @@ export async function running(matches: activematch[], client: discord.Client){
                     await (msg as discord.Message).react("🅱️")
                 })
 
-                await channelid.send("@everyone")
+                await channelid.send("@eveyone")
                 
                 // channelid.fetchMessages({ limit: 1 }).then(messages => {
                 //     let lastMessage = messages.first();
@@ -185,8 +185,8 @@ export async function running(matches: activematch[], client: discord.Client){
 
         if(match.votingperiod === true){
             //7200
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 1800)){
-                end(matches, client)
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 30)){
+                await end(matches, client)
             }
         }
     }

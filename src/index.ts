@@ -123,12 +123,13 @@ client.on("message", async message => {
   const prefix = config.prefix;
   console.log(matches)
   
-  running(matches, client)
+  
 
   if (message.content.indexOf(prefix) !== 0 || message.author.bot){
     return;
   }
 
+  await running(matches, client)
 
   var args: Array<string> = message.content.slice(prefix.length).trim().split(/ +/g);
   

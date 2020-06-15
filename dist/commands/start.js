@@ -116,14 +116,14 @@ async function running(matches, client) {
                     await msg.react("🅰️");
                     await msg.react("🅱️");
                 });
-                await channelid.send("@everyone");
+                await channelid.send("@eveyone");
                 match.votingperiod = true;
                 match.votetime = (Math.floor(Date.now() / 1000));
             }
         }
         if (match.votingperiod === true) {
-            if ((Math.floor(Date.now() / 1000) - match.votetime >= 1800)) {
-                winner_1.end(matches, client);
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 30)) {
+                await winner_1.end(matches, client);
             }
         }
     }
