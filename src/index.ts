@@ -4,7 +4,7 @@ import {activematch} from "./misc/struct"
 import {submit} from "./commands/submit"
 import { start, running } from "./commands/start";
 import { endmatch } from "./commands/winner";
-import { vs, p1 } from "./commands/card";
+import { vs } from "./commands/card";
 import { getUser } from "./misc/utils";
 //import data from "../match.json"
 const fs = require('fs');
