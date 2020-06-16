@@ -16,13 +16,13 @@ export async function submit(message: Discord.Message, matches: activematch[]) {
 
     else{
         for (const match of matches){
-            if(match.p1.userid.id === message.author.id && !match.p1.memedone){
+            if(match.p1.userid === message.author.id && !match.p1.memedone){
                 match.p1.memedone = true
                 match.p1.memelink = message.attachments.array()[0].url
                 return message.reply("Your meme has been attached!")
             }
 
-            if(match.p2.userid.id === message.author.id && !match.p2.memedone){
+            if(match.p2.userid === message.author.id && !match.p2.memedone){
                 match.p2.memedone = true
                 match.p2.memelink = message.attachments.array()[0].url
                 return message.reply("Your meme has been attached!")

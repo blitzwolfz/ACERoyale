@@ -4,10 +4,17 @@ import {activematch} from "./misc/struct"
 import {submit} from "./commands/submit"
 import { start, running } from "./commands/start";
 import { endmatch } from "./commands/winner";
-import { vs } from "./commands/card";
+import { vs, p1 } from "./commands/card";
 import { getUser } from "./misc/utils";
+//import data from "../match.json"
+const fs = require('fs');
 
 console.log("Hello World, bot has begun life");
+
+let data = fs.readFileSync('./match.json');
+let matchdata = JSON.parse(data);
+
+let matches:activematch[] = matchdata
 
 const express = require('express');
 const app = express();
@@ -27,11 +34,22 @@ const listener = app.listen(process.env.PORT, () => {
     console.log('Your app is listening on port ' + listener.address().port);
 });
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user?.tag}`);
+    console.log("OK")
+    // for(let i = 0; i < 2; i++) console.log(i)
+    await running(matches, client)
+    let data = JSON.stringify(matches, null, 2);
+    if (!matches){
+      await fs.writeFile('./match.json', data, (err) => {
+        if (err) throw err;
+        console.log('Data written to file');
+    });
+    }
+
 });
 
-let matches:activematch[] = []
+
 
 client.on("messageReactionAdd", async function(messageReaction, user){
   console.log(`a reaction is added to a message`);
@@ -42,6 +60,11 @@ client.on("messageReactionAdd", async function(messageReaction, user){
     for (const match of matches){
       console.log(match.p1.voters)
       console.log(match.p2.voters)
+      if(user.id === match.p1.userid || user.id === match.p2.userid){
+        await messageReaction.remove(user.id)
+        return await user.send("Can't vote on your own meme")
+      }
+      
       let id = client.channels.get(messageReaction.message.channel.id)?.id
 
       if(match.channelid === id){
@@ -50,7 +73,7 @@ client.on("messageReactionAdd", async function(messageReaction, user){
           if (messageReaction.emoji.name === "🅱️"){
             match.p2.votes += 1
             match.p2.voters.push(user.id)
-  
+            
             await messageReaction.remove(user.id)
             await messageReaction.message.react("🅱️")
           }
@@ -107,7 +130,12 @@ client.on("messageReactionAdd", async function(messageReaction, user){
       }
       
     }
-    
+    let data = JSON.stringify(matches, null, 2);
+
+    await fs.writeFile('./match.json', data, (err) => {
+        if (err) throw err;
+        console.log('Data written to file');
+    });
   }
 
 });
@@ -129,8 +157,8 @@ client.on("message", async message => {
     return;
   }
 
+  
   await running(matches, client)
-
   var args: Array<string> = message.content.slice(prefix.length).trim().split(/ +/g);
   
   if (!args || args.length === 0) {
@@ -151,18 +179,19 @@ client.on("message", async message => {
   }
 
   else if(command === "submit"){
-    submit(message, matches)
+    await submit(message, matches)
+    if(!matches) await running(matches, client)
   }
 
   else if(command === "start"){
-    start(message, client, matches)
+    await start(message, client, matches)
   }
 
   else if(command === "end"){
     if (message.author.id !== "239516219445608449"){
       return
     }
-    endmatch(message, matches, client)
+    await endmatch(message, matches, client)
   }
 
   else if(command === "vs"){
@@ -176,6 +205,13 @@ client.on("message", async message => {
     }
     await vs(message, client, users)
   }
+
+  let data = JSON.stringify(matches, null, 2);
+
+  await fs.writeFile('./match.json', data, (err) => {
+      if (err) throw err;
+      console.log('Data written to file');
+  });
   
 });
 

@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord = __importStar(require("discord.js"));
 const utils_1 = require("../misc/utils");
 const config_json_1 = require("../misc/config.json");
+const winner_1 = require("./winner");
 const card_1 = require("./card");
 async function start(message, client, matches) {
     let users = [];
@@ -28,7 +29,7 @@ async function start(message, client, matches) {
     let newmatch = {
         channelid: message.channel.id,
         p1: {
-            userid: user1,
+            userid: user1.id,
             memedone: false,
             time: Math.floor(Date.now() / 1000),
             memelink: "",
@@ -36,7 +37,7 @@ async function start(message, client, matches) {
             voters: [],
         },
         p2: {
-            userid: user2,
+            userid: user2.id,
             memedone: false,
             time: Math.floor(Date.now() / 1000),
             memelink: "",
@@ -72,35 +73,58 @@ async function running(matches, client) {
         console.log(Math.floor(Date.now() / 1000) - match.votetime);
         console.log((Math.floor(Date.now() / 1000) - match.votetime) >= 1800);
         let channelid = client.channels.get(match.channelid);
+        let user1 = (await client.fetchUser(match.p1.userid));
+        let user2 = (await client.fetchUser(match.p2.userid));
         if (match.votingperiod === false) {
             if ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false) {
-                match.p1.userid.send("You have failed to submit your meme, your opponet is the winner.");
+                user1.send("You have failed to submit your meme, your opponet is the winner.");
                 let embed = new discord.RichEmbed()
-                    .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                    .setDescription(`<@${match.p2.userid.id}> has won!`)
+                    .setTitle(`Match between ${user1.username} and ${user2.username}`)
+                    .setDescription(`<@${user2.id}> has won!`)
                     .setTimestamp();
                 channelid.send(embed);
             }
             else if ((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) {
                 console.log(Date.now() - match.p2.time);
-                match.p2.userid.send("You have failed to submit your meme, your opponet is the winner.");
+                user2.send("You have failed to submit your meme, your opponet is the winner.");
                 let embed = new discord.RichEmbed()
-                    .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                    .setDescription(`<@${match.p1.userid.username}> has won!`)
+                    .setTitle(`Match between ${user1.username} and ${user2.username}`)
+                    .setDescription(`<@${user1.username}> has won!`)
                     .setTimestamp();
                 channelid.send(embed);
             }
             else if (((Math.floor(Date.now() / 1000) - match.p2.time > 1800) && match.p2.memedone === false) && ((Math.floor(Date.now() / 1000) - match.p1.time > 1800) && match.p1.memedone === false)) {
-                match.p1.userid.send("You have failed to submit your meme");
-                match.p2.userid.send("You have failed to submit your meme");
+                user1.send("You have failed to submit your meme");
+                user2.send("You have failed to submit your meme");
                 let embed = new discord.RichEmbed()
-                    .setTitle(`Match between ${match.p1.userid.username} and ${match.p2.userid.username}`)
-                    .setDescription(`<@${match.p1.userid.id}> & ${match.p2.userid.username}have lost\n for not submitting meme on time`)
+                    .setTitle(`Match between ${user1.username} and ${user2.username}`)
+                    .setDescription(`<@${user1.id}> & ${user2.id}have lost\n for not submitting meme on time`)
                     .setTimestamp();
                 channelid.send(embed);
             }
             else if (((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p2.memedone === true) && ((Math.floor(Date.now() / 1000) - match.p2.time < 1800) && match.p1.memedone === true)) {
-                channelid.send(`/poll "Vote for best meme" "Image A" "Image B"`);
+                let embed1 = new discord.RichEmbed()
+                    .setImage(match.p1.memelink)
+                    .setTimestamp();
+                let embed2 = new discord.RichEmbed()
+                    .setImage(match.p2.memelink)
+                    .setTimestamp();
+                let embed3 = new discord.RichEmbed()
+                    .setTitle("Please vote")
+                    .setDescription("Vote for Meme 1 reacting with 🅰️\nMeme 2 by reacting with 🅱️");
+                await channelid.send(embed1);
+                await channelid.send(embed2);
+                await channelid.send(embed3).then(async (msg) => {
+                    await msg.react("🅰️");
+                    await msg.react("🅱️");
+                });
+                match.votingperiod = true;
+                match.votetime = (Math.floor(Date.now() / 1000));
+            }
+        }
+        if (match.votingperiod === true) {
+            if ((Math.floor(Date.now() / 1000) - match.votetime >= 3600)) {
+                await winner_1.end(matches, client);
             }
         }
     }
